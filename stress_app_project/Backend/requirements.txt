@@ -1,9 +1,0 @@
-fastapi
-uvicorn[standard]
-scikit-learn
-pandas
-joblib
-transformers
-torch
-pydantic
-sqlalchemy
