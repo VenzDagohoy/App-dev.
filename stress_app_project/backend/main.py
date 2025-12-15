@@ -6,11 +6,10 @@ import joblib
 import pandas as pd
 import uvicorn
 import os
-
-# --- NEW: IMPORT SHARED DATABASE LOGIC ---
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import Session
 from database import engine, SessionLocal, Base  
+
 
 # --- APP CONFIGURATION ---
 app = FastAPI()
@@ -24,9 +23,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- DATABASE MODEL (The Table Structure) ---
+# --- DATABASE MODEL ---
 class StudentRecord(Base):
-    __tablename__ = "prediction_records"
+    __tablename__ = "student_records"  # <--- CHANGED: Unified Name
 
     id = Column(Integer, primary_key=True, index=True)
     # Inputs
@@ -50,9 +49,11 @@ class StudentRecord(Base):
     peer_pressure = Column(Integer)
     extracurricular_activities = Column(Integer)
     bullying = Column(Integer)
-    # Outputs (Results)
-    predicted_label = Column(String)
-    predicted_factors = Column(String) 
+    
+    # Outputs
+    stress_level = Column(Integer)       # <--- For Training (0,1,2)
+    predicted_label = Column(String)     # For Display ("High Stress")
+    predicted_factors = Column(String)   # For Display ("Anxiety, Sleep")
 
 # --- GLOBAL VARIABLES ---
 model = None      # Random Forest (Score)
@@ -140,7 +141,7 @@ def predict_stress(data: StudentData, db: Session = Depends(get_db)):
     if not model: raise HTTPException(status_code=503, detail="Model not loaded")
     
     input_df = pd.DataFrame([data.dict()])
-    prediction = int(model.predict(input_df)[0])
+    prediction = int(model.predict(input_df)[0]) # 0, 1, or 2
     labels = {0: "Low Stress", 1: "Medium Stress", 2: "High Stress"}
     label = labels.get(prediction, "Unknown")
     
@@ -157,6 +158,7 @@ def predict_stress(data: StudentData, db: Session = Depends(get_db)):
     try:
         new_record = StudentRecord(
             **data.dict(),
+            stress_level=prediction,          # <--- Save the integer for training
             predicted_label=label,
             predicted_factors=", ".join(factors)
         )
