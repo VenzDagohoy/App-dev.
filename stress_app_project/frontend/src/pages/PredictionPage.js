@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ExternalLink, Info, Brain, HeartPulse, GraduationCap, Users, Home, ChevronDown, ChevronUp, Activity } from 'lucide-react';
+import { ExternalLink, Info, Brain, HeartPulse, GraduationCap, Users, Home, ChevronDown, ChevronUp, Activity, Loader2 } from 'lucide-react';
 
 // --- CONFIGURATION ---
 const fieldGroups = [
@@ -64,6 +64,7 @@ export default function PredictionPage() {
   const [form, setForm] = useState(allFields.reduce((acc, f) => ({ ...acc, [f.name]: 0 }), {}));
   const [result, setResult] = useState(null);
   const [showRef, setShowRef] = useState(false);
+  const [loading, setLoading] = useState(false); // <--- NEW STATE
   
   // --- REF FOR SCROLLING ---
   const topRef = useRef(null);
@@ -71,6 +72,8 @@ export default function PredictionPage() {
   // --- HANDLERS ---
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // <--- START LOADING
+    
     try {
       const { data } = await axios.post('http://127.0.0.1:8000/predict', form);
       const exp = await axios.post('http://127.0.0.1:8000/explain', { label: data.label, factors: data.factors });
@@ -82,6 +85,8 @@ export default function PredictionPage() {
       }
     } catch { 
       alert("Backend offline. Please start the FastAPI server."); 
+    } finally {
+      setLoading(false); // <--- END LOADING
     }
   };
 
@@ -174,9 +179,31 @@ export default function PredictionPage() {
             </motion.div>
           ))}
         </div>
-        <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="btn-primary" style={styles.submitBtn}>
-          Run Analysis
+        
+        {/* ANIMATED LOADING BUTTON */}
+        <motion.button 
+          whileHover={!loading ? { scale: 1.02 } : {}} 
+          whileTap={!loading ? { scale: 0.98 } : {}} 
+          className="btn-primary" 
+          disabled={loading}
+          style={{ 
+            ...styles.submitBtn, 
+            opacity: loading ? 0.7 : 1, 
+            cursor: loading ? 'not-allowed' : 'pointer' 
+          }}
+        >
+          {loading ? (
+            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+              <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }}>
+                <Loader2 size={20} /> 
+              </motion.div>
+              Analyzing...
+            </span>
+          ) : (
+            "Run Analysis"
+          )}
         </motion.button>
+
       </form>
     </motion.div>
   );
