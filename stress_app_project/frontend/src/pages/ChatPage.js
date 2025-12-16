@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
-import { Send, Bot, User, Sparkles, Trash2, Zap, Clock, MessageSquare } from 'lucide-react';
+import { Send, Bot, User, Trash2, Zap, Clock, MessageSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 // --- CONFIGURATION ---
@@ -48,7 +48,7 @@ export default function ChatPage() {
       const botMsg = { 
         role: 'bot', 
         text: data.reply, 
-        advice: data.advice,
+        // REMOVED: advice field
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
       };
 
@@ -87,7 +87,7 @@ export default function ChatPage() {
         </div>
         <p style={{ color: '#94a3b8' }}>Powered by NLP & Sentiment Analysis</p>
         
-        <button onClick={clearChat} style={styles.clearButton} onMouseOver={(e) => e.target.style.background = 'rgba(239, 68, 68, 0.2)'} onMouseOut={(e) => e.target.style.background = 'rgba(255,255,255,0.05)'}>
+        <button onClick={clearChat} style={styles.clearButton}>
           <Trash2 size={16} /> Clear
         </button>
       </div>
@@ -117,13 +117,7 @@ export default function ChatPage() {
                   {m.text}
                 </div>
 
-                {/* Advice Card */}
-                {m.advice && (
-                  <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} style={styles.adviceCard}>
-                    <div style={styles.adviceHeader}><Sparkles size={16} /> Wellness Tip</div>
-                    <span style={{ color: '#fde047', fontSize: '0.95rem' }}>{m.advice}</span>
-                  </motion.div>
-                )}
+                {/* REMOVED: Advice Card Section was here */}
 
                 {/* Timestamp */}
                 <div style={styles.timestamp}><Clock size={10} /> {m.time}</div>
@@ -178,24 +172,17 @@ export default function ChatPage() {
 
 // --- STYLES OBJECT ---
 const styles = {
-  // CHANGED: Increased height to 85vh to fill more screen space
   container: { height: '85vh', display: 'flex', flexDirection: 'column', maxWidth: '1000px', margin: '0 auto', width: '100%' },
-  
   headerContainer: { textAlign: 'center', marginBottom: '1.5rem', position: 'relative' },
   titleWrapper: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '0.5rem' },
   iconBox: { background: 'rgba(139, 92, 246, 0.2)', padding: '10px', borderRadius: '12px', display: 'flex' },
   title: { fontSize: '2.5rem', margin: 0, background: 'linear-gradient(to right, #a78bfa, #f472b6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontWeight: 800 },
   clearButton: { position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', transition: 'all 0.2s' },
-  
-  // CHANGED: Added minHeight to ensure it feels tall even on larger screens
   chatWindow: { flex: 1, minHeight: '600px', display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: 0, background: 'linear-gradient(145deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8))', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.05)', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)' },
-  
   messagesArea: { flex: 1, overflowY: 'auto', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem' },
   messageRow: { display: 'flex', gap: '15px' },
   avatar: { width: '42px', height: '42px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', flexShrink: 0 },
   bubble: { padding: '14px 20px', borderRadius: '20px', color: 'white', lineHeight: '1.6', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', fontSize: '1rem' },
-  adviceCard: { marginTop: '12px', background: 'rgba(250, 204, 21, 0.05)', border: '1px solid rgba(250, 204, 21, 0.2)', padding: '15px', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '100%', boxShadow: '0 4px 15px rgba(250, 204, 21, 0.05)' },
-  adviceHeader: { display: 'flex', alignItems: 'center', gap: '8px', color: '#facc15', fontWeight: '600', fontSize: '0.9rem' },
   timestamp: { display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: '#64748b', marginTop: '6px', margin: '0 5px' },
   loadingBubble: { padding: '12px 20px', borderRadius: '20px', background: 'rgba(255,255,255,0.03)', color: '#94a3b8', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px' },
   inputArea: { padding: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)', background: 'rgba(15, 23, 42, 0.8)' },
