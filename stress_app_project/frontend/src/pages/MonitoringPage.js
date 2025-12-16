@@ -79,23 +79,25 @@ export default function MonitoringPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px' }}>
             <thead style={{ background: 'rgba(15, 23, 42, 0.8)' }}>
               <tr>
-                {['ID', 'Result', 'Anxiety', 'Sleep', 'Load', 'Key Factors'].map(h => (
+                {/* CHANGED: Only 3 headers now */}
+                {['ID', 'Result', 'Key Factors'].map(h => (
                   <th key={h} style={styles.th}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {data.length === 0 ? (
-                <tr><td colSpan="6" style={styles.emptyState}><Activity size={40} color="#475569" /><p>No data recorded yet.</p></td></tr>
+                // CHANGED: colSpan reduced from 6 to 3
+                <tr><td colSpan="3" style={styles.emptyState}><Activity size={40} color="#475569" /><p>No data recorded yet.</p></td></tr>
               ) : (
                 [...data].reverse().map((row, i) => (
                   <tr key={row.id} style={{ background: i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent' }}>
                     <td style={styles.td}>#{row.id}</td>
                     <td style={styles.td}><span style={getBadgeStyle(row.predicted_label)}>{row.predicted_label}</span></td>
-                    <td style={styles.td}>{row.anxiety_level}</td>
-                    <td style={styles.td}>{row.sleep_quality}</td>
-                    <td style={styles.td}>{row.study_load}</td>
-                    <td style={{ ...styles.td, color: '#94a3b8', maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.predicted_factors}</td>
+                    {/* CHANGED: Removed Anxiety, Sleep, Load columns */}
+                    <td style={{ ...styles.td, color: '#94a3b8', maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {row.predicted_factors}
+                    </td>
                   </tr>
                 ))
               )}
