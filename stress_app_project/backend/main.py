@@ -202,12 +202,7 @@ async def chat_endpoint(input_data: ChatInput):
     recent_history = input_data.history[-4:]
     conversation_text = "\n".join(recent_history)
 
-    # 1. Quick Static Responses (Modified to remove advice)
-    msg = input_data.message.lower()
-    if "panic" in msg: return {"reply": "Take a deep breath. 4 seconds in, 4 seconds hold, 4 seconds out. I'm here."}
-    if "sleep" in msg: return {"reply": "Racing thoughts? Try writing them down or listening to white noise."}
-
-    # 2. AI Generation
+    # 1. AI Generation
     prompt = (
         f"<|system|>\n"
         f"You are MindEase, a warm, empathetic AI therapist. "
@@ -231,7 +226,18 @@ async def chat_endpoint(input_data: ChatInput):
 @app.get("/monitoring-data")
 def get_monitoring_data(db: Session = Depends(get_db)):
     records = db.query(StudentRecord).all()
-    return [{"id": r.id, "predicted_label": r.predicted_label, "anxiety_level": r.anxiety_level, "sleep_quality": r.sleep_quality, "study_load": r.study_load} for r in records]
+    # ADDED: "predicted_factors": r.predicted_factors
+    return [
+        {
+            "id": r.id, 
+            "predicted_label": r.predicted_label, 
+            "anxiety_level": r.anxiety_level, 
+            "sleep_quality": r.sleep_quality, 
+            "study_load": r.study_load,
+            "predicted_factors": r.predicted_factors 
+        } 
+        for r in records
+    ]
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
