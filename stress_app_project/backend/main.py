@@ -202,6 +202,12 @@ async def chat_endpoint(input_data: ChatInput):
     recent_history = input_data.history[-4:]
     conversation_text = "\n".join(recent_history)
 
+    # 1. Quick Static Responses (Modified to remove advice)
+    msg = input_data.message.lower()
+    if "panic" in msg: return {"reply": "Take a deep breath. 4 seconds in, 4 seconds hold, 4 seconds out. I'm here."}
+    if "sleep" in msg: return {"reply": "Racing thoughts? Try writing them down or listening to white noise."}
+
+    # 2. AI Generation
     prompt = (
         f"<|system|>\n"
         f"You are MindEase, a warm, empathetic AI therapist. "
@@ -217,8 +223,10 @@ async def chat_endpoint(input_data: ChatInput):
         response = text_gen(prompt, max_new_tokens=250, do_sample=True, temperature=0.8, repetition_penalty=1.2)[0]['generated_text']
         reply = response.split("<|assistant|>\n")[-1].strip()
     except Exception:
-        reply = "I'm listening."
-    return {"reply": reply, "advice": "Active Listening"}
+        reply = "I'm listening. Could you tell me more about how that makes you feel?"
+    
+    # Final return without advice
+    return {"reply": reply}
 
 @app.get("/monitoring-data")
 def get_monitoring_data(db: Session = Depends(get_db)):
